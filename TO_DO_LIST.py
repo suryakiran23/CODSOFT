@@ -1,72 +1,60 @@
-class Task:
-    def __init__(self, description):
-        self.description = description
-        self.completed = False
-    def __str__(self):
-        return f"[{'x' if self.completed else ' '}] {self.description}"
+tasks = []
 
-import pickle
+def add_task(task_description):
+    tasks.append({"description": task_description, "completed": False})
+    print(f"Task '{task_description}' added.")
 
-class ToDoList:
-    def __init__(self):
-        self.tasks = []
+def view_tasks():
+    if not tasks:
+        print("No tasks to show.")
+    else:
+        for index, task in enumerate(tasks):
+            status = "Done" if task["completed"] else "Pending"
+            print(f"{index + 1}. {task['description']} - {status}")
 
-    def add_task(self, description):
-        self.tasks.append(Task(description))
+def mark_task_completed(task_number):
+    if 0 < task_number <= len(tasks):
+        tasks[task_number - 1]["completed"] = True
+        print(f"Task {task_number} marked as completed.")
+    else:
+        print("Invalid task number.")
 
-    def view_tasks(self):
-        for idx, task in enumerate(self.tasks, start=1):
-            print(f"{idx}. {task}")
+def delete_task(task_number):
+    if 0 < task_number <= len(tasks):
+        task = tasks.pop(task_number - 1)
+        print(f"Task '{task['description']}' deleted.")
+    else:
+        print("Invalid task number.")
 
-    def mark_task_completed(self, index):
-        if 0 <= index < len(self.tasks):
-            self.tasks[index].completed = True
-
-    def delete_task(self, index):
-        if 0 <= index < len(self.tasks):
-            self.tasks.pop(index)
-
-    def save_tasks(self, filename):
-        with open(filename, 'wb') as f:
-            pickle.dump(self.tasks, f)
-
-    def load_tasks(self, filename):
+while True:
+    print("\nTo-Do List Application")
+    print("1. Add Task")
+    print("2. View Tasks")
+    print("3. Completed Task")
+    print("4. Delete Task")
+    print("5. Exit")
+    
+    choice = input("Enter your choice: ").strip()
+    
+    if choice == '1':
+        task_description = input("Enter task description: ").strip()
+        add_task(task_description)
+    elif choice == '2':
+        view_tasks()
+    elif choice == '3':
         try:
-            with open(filename, 'rb') as f:
-                self.tasks = pickle.load(f)
-        except FileNotFoundError:
-            self.tasks = []
-
-def main():
-    todo_list = ToDoList()
-    todo_list.load_tasks('tasks.pkl')
-
-    while True:
-        print("\nOptions:")
-        print("1. Add task") 
-        print("2. View tasks")
-        print("3. Complete task")
-        print("4. Delete task")
-        print("5. Save and exit")
-
-        choice = input("Choose an option: ")
-
-        if choice == '1':
-            description = input("Enter task description: ")
-            todo_list.add_task(description)
-        elif choice == '2':
-            todo_list.view_tasks()
-        elif choice == '3':
-            index = int(input("Enter task number to mark as completed: ")) - 1
-            todo_list.mark_task_completed(index)
-        elif choice == '4':
-            index = int(input("Enter task number to delete: ")) - 1
-            todo_list.delete_task(index)
-        elif choice == '5':
-            todo_list.save_tasks('tasks.pkl')
-            break
-        else:
-            print("Invalid choice, please try again.")
-
-if __name__ == "__main__":
-    main()
+            task_number = int(input("Enter task number to mark as completed: ").strip())
+            mark_task_completed(task_number)
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+    elif choice == '4':
+        try:
+            task_number = int(input("Enter task number to delete: ").strip())
+            delete_task(task_number)
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+    elif choice == '5':
+        print("Exiting...")
+        break
+    else:
+        print("Invalid choice. Please try again.")
